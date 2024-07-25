@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Book Details</h1>
+<ul class="list-group">
+ <li class="list-group-item">
+  {% if book.cover %}
+   <img src="{{ book.cover.url }}" alt="">
+   <br>
+  {% endif %}
+  {% if book.sample %}
+    <span class="text-info">Sample: </span>
+   <a href="{{book.sample.url}}" target="_blank">Download</a>
+   <br>
+  {% endif %}
+  <span class="text-info">Title: </span>
+  <span>{{book.title }}</span>
+  <br>
+  <span class="text-info">Publisher: </span>
+  <span>{{book.publisher }}</span>
+  <br>
+  <span class="text-info">Publication Date: </span>
+  <span>{{book.publication_date }}</span>
+  <br>
+  <span class="text-info">Overall Rating: </span>
+  <span class="badge badge-primary badge-pill">{{book_rating }}</span>
+  <br>
+ </li>
+</ul>
+<h1>Review Comments</h1>
+<ul>
+  {% if book_rating == 0 %}
+   {% if user.is_authenticated%}
+     <span class="text-secondary">Provide a rating and write the first review for this book.</span>
+   {% endif %}
+  {% endif %}
+  {% for review in reviews %}
+   <li class="list-group-item">
+    <span class="text-info">Review comment: </span>
+    <span>{{review.content }}</span>
+    <br>
+    <span class="text-info">Created on: </span>
+    <span>{{review.date_created }}</span>
+    <br>
+    <span class="text-info">Modified on: </span>
+    <span>{{review.date_edited }}</span>
+    <br>
+    <span class="text-info">Rating: </span>
+    <span style="background-color: grey" class="badge badge-primary badge-pill">{{ review.rating }}</span>
+    <br>
+    <span class="text-info">Creator: </span>
+    <span>{{review.creator}}</span>
+   </li>
+  {% if user.is_staff or user.id == review.creator_id %}
+   <a href="/books/{{ book.id }}/reviews/{{ review.id }}/">Edit Review</a>
+  {% else %}
+  </br>
+  {% endif %}
+  {% endfor %}
+</ul>
+{% if user.is_authenticated %}
+ <a class="btn btn-primary" href="/books/{{book.id}}/reviews/new/">Add Review</a>
+ <a class="btn btn-primary" href="/books/{{book.id}}/media/">Media</a>
+{% endif %}
+{% endblock %}

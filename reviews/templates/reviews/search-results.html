@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if form.is_valid and search_text %}
+Search Results for "{{ search_text }}"
+{% else %}
+Book Search
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>Search for Books</h2>
+<form method="get">
+<!--    {% csrf_token %} &lt;!&ndash; Khi dùng chứng chỉ này thì đường link sẽ chèn thêm chứng chỉ vào&ndash;&gt;-->
+    {{ form.as_p }}
+    <input class="btn btn-primary" type="submit" value="Search">
+</form>
+
+{% if form.is_valid is True and search_text != '' %}
+<div>
+    <h3>Search Result for <em>{{ search_text }}</em></h3>
+</div>
+<ul class="list-group">
+    {% for book in books_list %}
+        <li class="list-group-item">
+            <span class="text-info">Title: </span>
+            <a href="/books/{{book.id}}">{{ book }}</a>
+            <br/>
+            <span class="text-info">Contributors: </span>
+            {% for contributor in book.contributors.all %} <!--key của bài này-->
+
+<!--Tự động truy vấn thông qua bảng trung gian-->
+<!--contributors là 1 thuộc tính của bảng Book -->
+<!--nhưng vì trong models thuộc tính contributors cho bảng Book với kiểu ManytoMany với bảng Contributor nên nó không hiện cột này trong database-->
+
+                {{ contributor.first_names }} {{ contributor.last_names }}
+                {% if not forloop.last %},{% endif %} <!-- Kiểm tra xem vòng lặp này là vòng cuối chưa-->
+            {% endfor %}
+        </li>
+        {% empty %}<!--Dùng để kiểm tra xem vòng lặp có rỗng hay không-->
+        <li class="list-group-item">No results found.</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
